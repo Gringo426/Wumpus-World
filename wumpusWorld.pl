@@ -1,7 +1,17 @@
-:- dynamic
-	panel/3.
+/*
+File: WumpusWorld
+Author: Ryan Grings
+Version: 3.0
+*/
 
-:- working_directory(_, 'F:/Linux Mint (12-29-2014)/Programming/Python-Prolog Combo/Wumpus World').
+:- dynamic
+	panel/3,
+	bounds/2,
+	hasGold/1.
+
+/* Uncomment out and change FD to a directory
+:- working_directory(_,FD).
+*/
 
 /* Facts
 panel(_,_,start).
@@ -16,10 +26,10 @@ panel(_,_,invalid).
 bounds(_,_).
 hasGold(yes).
 */
+
 % Default facts if importFacts fails
 defaultAssert :-
 	assert(bounds(1,3)),
-	assert(tPanels(2)),
 	assert(panel(1,1,start)),
 	assert(panel(2,2,gold)),
 	assert(panel(2,3,pit)),
@@ -28,9 +38,9 @@ defaultAssert :-
 
 % Used for playing and solving
 importFacts :-
-	exists_file('WumpusWorldBoard'),
+	exists_file('WumpusWorldBoard.txt'),
 	seeing(Old),
-	see('WumpusWorldBoard'),
+	see('WumpusWorldBoard.txt'),
 	repeat,
 	read(Data),
 	assertFact(Data),
@@ -250,10 +260,15 @@ isDeadSolver(X,Y):-
 
 % Used for solving
 movesNeeded :-
+	canSolve,
 	aggregate_all(count,panel(_,_,solution),Moves),
 	format('Moves needed: ~w~n',[Moves]).
 
 % Used for solving
 showSolution :-
+	canSolve,
 	panel(X,Y,solution),
 	format('Move: [~w,~w]~n',[X,Y]).
+
+commands :-
+	format('canSolve~nmovesNeeded~nshowSolution~nstart').
