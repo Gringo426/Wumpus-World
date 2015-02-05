@@ -1,6 +1,8 @@
 :- dynamic
 	panel/3.
 
+:- working_directory(_, 'F:/Linux Mint (12-29-2014)/Programming/Python-Prolog Combo/Wumpus World').
+
 /* Facts
 panel(_,_,start).
 panel(_,_,gold).
@@ -14,7 +16,6 @@ panel(_,_,invalid).
 bounds(_,_).
 hasGold(yes).
 */
-
 % Default facts if importFacts fails
 defaultAssert :-
 	assert(bounds(1,3)),
