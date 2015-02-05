@@ -48,7 +48,6 @@ def writeMap(mapSize,map):
 	fileName = "Wumpus Map " + str(mapSize) + " by " + str(mapSize) + ".txt"
 	f = open(fileName, 'w')
 	f.write("bounds(1," + str(mapSize) + ").\n")
-	f.write("tPanels(" + str(int(floor((mapSize*mapSize)/4))) + ").\n")
 	output = ""
 	for x in range(mapSize):
 		for y in range(mapSize):
