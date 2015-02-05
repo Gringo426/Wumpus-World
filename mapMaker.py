@@ -20,7 +20,6 @@ def userDefinedMap():
 
 	featureGenerator(mapSize)
 
-
 def featureGenerator(mapSize):
 	mS = mapSize
 	haz = floor(mapSize*mS/4)
@@ -60,10 +59,8 @@ def featureGenerator(mapSize):
 		else:
 			print("Invalid input. ")
 
-
 def writeMap(mapSize,map):
 	fileName = "Wumpus Map " + str(mapSize) + " by " + str(mapSize) + ".txt"
-	#fileName = "WumpusWorldBoard"
 	f = open(fileName, 'w')
 	f.write("bounds(1," + str(mapSize) + ").\n")
 	f.write("tPanels(" + str(int(floor((mapSize*mapSize)/4))) + ").\n")
@@ -82,7 +79,6 @@ def writeMap(mapSize,map):
 				pass
 	f.write(output)
 	f.close()
-
 
 def displayMap(mapSize,map):
 	print("Map Size: " + str(mapSize) + "\n")
