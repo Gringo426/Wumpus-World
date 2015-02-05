@@ -1,8 +1,12 @@
 from math import floor
 from random import randint
+from os.path import isdir, join
+from os import mkdir, getcwd, chdir
+from glob import glob
 
 def randMap():
 	mapSize = randint(3,15)
+	print(mapSize)
 	featureGenerator(mapSize)
 
 def featureGenerator(mapSize):
@@ -45,7 +49,19 @@ def featureGenerator(mapSize):
 			print("Invalid input. ")
 
 def writeMap(mapSize,map):
-	fileName = "Wumpus Map " + str(mapSize) + " by " + str(mapSize) + ".txt"
+	fileName = "Wumpus Map " + str(mapSize) + " by " + str(mapSize)
+	fileDir = str(mapSize) + " by " + str(mapSize)
+	if isdir("Good Boards"):
+		chdir("Good Boards")
+	else:
+		mkdir("Good Boards")
+		chdir("Good Boards")
+	if isdir(join(getcwd(), fileDir)):
+		chdir(fileDir)
+	else:
+		mkdir(fileDir)
+		chdir(fileDir)
+	fileName += " (" + str(len(glob("*.txt")) + 1) + ").txt"
 	f = open(fileName, 'w')
 	f.write("bounds(1," + str(mapSize) + ").\n")
 	output = ""
