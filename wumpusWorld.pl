@@ -1,6 +1,5 @@
 :- dynamic
 	panel/3.
-	turn/3.
 
 /* Facts
 panel(_,_,start).
@@ -11,14 +10,52 @@ panel(_,_,glitter).
 panel(_,_,breeze).
 panel(_,_,stench).
 panel(_,_,solution).
+panel(_,_,invalid).
 bounds(_,_).
 hasGold(yes).
-turn(_,_,_).
 */
 
-%/* Test Map
+% Default facts if importFacts fails
+defaultAssert :-
+	assert(bounds(1,3)),
+	assert(tPanels(2)),
+	assert(panel(1,1,start)),
+	assert(panel(2,2,gold)),
+	assert(panel(2,3,pit)),
+	assert(panel(3,2,wumpus)),
+	assert(panel(3,3,pit)).
 
-%*/
+% Used for playing and solving
+importFacts :-
+	exists_file('WumpusWorldBoard'),
+	seeing(Old),
+	see('WumpusWorldBoard'),
+	repeat,
+	read(Data),
+	assertFact(Data),
+	seen,
+	see(Old),
+	!.
+
+assertFact(Data):-
+	assert(Data),
+	fail.
+
+assertFact(end_of_file):-
+	!.
+
+% Completely resets map/Used for playing and solving
+fullReset :-
+	once(
+		(retractall(panel(_,_,_)),
+		retractall(hasGold(_)),
+		retractall(bounds(_,_)),
+		importFacts);
+		(retractall(panel(_,_,_)),
+		retractall(hasGold(_)),
+		retractall(bounds(_,_)),
+		defaultAssert)
+		).
 
 % Used for playing
 mapFeatures :-
@@ -26,22 +63,22 @@ mapFeatures :-
 	findStench;
 	findGlitter.
 
-% Used for playing and maybe for solving later
+% Used for playing
 findBreeze :-
 	panel(X,Y,pit),
 	assertFeature(X,Y,breeze).
 
-% Used for playing and maybe for solving later
+% Used for playing
 findStench :-
 	panel(X,Y,wumpus),
 	assertFeature(X,Y,stench).
 
-% Used for playing and maybe for solving later
+% Used for playing
 findGlitter :-
 	panel(X,Y,gold),
 	assertFeature(X,Y,glitter).
 
-% Used for playing and maybe for solving later
+% Used for playing
 assertFeature(X,Y,Feature):-
 	(Feature=glitter ->
 		assert(panel(X,Y,Feature))
@@ -61,7 +98,7 @@ assertFeature(X,Y,Feature):-
 
 % Used for playing
 start :-
-	reset,
+	fullReset,
 	mapFeatures,
 	panel(X,Y,start),
 	!,
@@ -154,54 +191,56 @@ isValid(X,Y):-
 
 % Used for solving
 canSolve :-
-	reset,
+	fullReset,
 	panel(X,Y,start),
-	tPanels(TP), % Remove if needed
-	canSolveHelper(X,Y,1,TP).
+	!,
+	canSolveHelper(X,Y).
 
 % Used for solving
-canSolveHelper(X,Y,T,TP):-
-	T < TP, % Remove if needed
+canSolveHelper(X,Y):-
 	once(
-		(
+		(	
 			panel(X,Y,gold),
-			not(isDeadSolver(X,Y)),
-			Z is (T-1),
-			assert(movesNeeded(Z))
+			not(isDeadSolver(X,Y))
 		);
 		(
 			A is (X+1),
 			not(isDeadSolver(A,Y)),
-			not(turn(A,Y,_)),
-			move(A,Y,T,TP)
+			not(panel(A,Y,solution)),
+			not(panel(A,Y,invalid)),
+			move(A,Y)
 		);
 		(
 			B is (Y+1),
 			not(isDeadSolver(X,B)),
-			not(turn(X,B,_)),
-			move(X,B,T,TP)
+			not(panel(X,B,solution)),
+			not(panel(X,B,invalid)),
+			move(X,B)
 		);
 		(
 			C is (X-1),
 			not(isDeadSolver(C,Y)),
-			not(turn(C,Y,_)),
-			move(C,Y,T,TP)
+			not(panel(C,Y,solution)),
+			not(panel(C,Y,invalid)),
+			move(C,Y)
 		);
 		(
 			D is (Y-1),
 			not(isDeadSolver(X,D)),
-			not(turn(X,D,_)),
-			move(X,D,T,TP)
+			not(panel(X,D,solution)),
+			not(panel(X,D,invalid)),
+			move(X,D)
 		)
 		).
 
 % Used for solving
-move(X,Y,T,TP):-
+move(X,Y):-
 	isValid(X,Y),
-	assert(turn(X,Y,T)),
-	Z is (T+1),
-	canSolveHelper(X,Y,Z,TP);
-	retract(turn(X,Y,T)),false.
+	assert(panel(X,Y,solution)),
+	canSolveHelper(X,Y);
+	retract(panel(X,Y,solution)),
+	assert(panel(X,Y,invalid)),
+	false.
 
 % Used for solving
 isDeadSolver(X,Y):-
@@ -210,24 +249,10 @@ isDeadSolver(X,Y):-
 
 % Used for solving
 movesNeeded :-
-	aggregate_all(count,turn(_,_,_),Moves),
+	aggregate_all(count,panel(_,_,solution),Moves),
 	format('Moves needed: ~w~n',[Moves]).
 
 % Used for solving
 showSolution :-
-	sSH(1).
-
-sSH(T):-
-	turn(X,Y,T),
-	format('~w [~w,~w]~n',[T,X,Y]),
-	Z is (T+1),
-	sSH(Z).
-
-% Used for solving and playing
-reset :-
-	retractall(panel(_,_,breeze)),
-	retractall(panel(_,_,stench)),
-	retractall(panel(_,_,glitter)),
-	retractall(hasGold(_)),
-	retractall(movesNeeded(_)),
-	retractall(turn(_,_,_)).
+	panel(X,Y,solution),
+	format('Move: [~w,~w]~n',[X,Y]).
