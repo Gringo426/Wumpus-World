@@ -87,9 +87,12 @@ if __name__ == "__main__":
 	choice = ""
 	while True:
 		choice = input("Please enter a map size (integer number) greater than 2 or enter r for a random size map. ")
-		if isinstance(choice, int):
-			featureGenerator(choice)
-		elif choice == "r":
-			randMap()
-		else:
-			print(choice, "is not valid input. ")
+		try:
+			if choice == "r":
+				randMap()
+			else:
+				choice = int(choice)
+				if isinstance(choice, int):
+					featureGenerator(choice)
+		except ValueError:
+			print(choice, "is not a valid input.")
