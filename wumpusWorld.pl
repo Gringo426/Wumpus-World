@@ -1,9 +1,3 @@
-/*
-File: WumpusWorld
-Author: Ryan Grings
-Version: 3.0
-*/
-
 :- dynamic
 	panel/3,
 	bounds/2,
