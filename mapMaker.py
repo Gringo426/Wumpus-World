@@ -5,21 +5,6 @@ def randMap():
 	mapSize = randint(3,15)
 	featureGenerator(mapSize)
 
-
-def userDefinedMap():
-	while True:
-		mapSize = input("Enter the size of map to create greater than 2. ")
-		try:
-			mapSize = int(mapSize)
-			if mapSize > 2:
-				break
-			else:
-				print("Input too small.")
-		except:
-			print("Invalid input.")
-
-	featureGenerator(mapSize)
-
 def featureGenerator(mapSize):
 	mS = mapSize
 	haz = floor(mapSize*mS/4)
@@ -99,5 +84,12 @@ def displayMap(mapSize,map):
 	print(output)
 
 if __name__ == "__main__":
-	#randMap()
-	userDefinedMap()
+	choice = ""
+	while True:
+		choice = input("Please enter a map size (integer number) greater than 2 or enter r for a random size map. ")
+		if isinstance(choice, int):
+			featureGenerator(choice)
+		elif choice == "r":
+			randMap()
+		else:
+			print(choice, "is not valid input. ")
